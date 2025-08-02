@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日主题 - 随心情变化的动态界面</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- 主题切换控制面板 -->
+        <div class="theme-controls">
+            <h2>主题控制</h2>
+            <div class="control-buttons">
+                <button class="theme-btn" data-theme="auto">自动模式</button>
+                <button class="theme-btn" data-theme="morning">清晨</button>
+                <button class="theme-btn" data-theme="afternoon">午后</button>
+                <button class="theme-btn" data-theme="evening">黄昏</button>
+                <button class="theme-btn" data-theme="night">夜晚</button>
+                <button class="theme-btn" data-theme="happy">开心</button>
+                <button class="theme-btn" data-theme="calm">平静</button>
+                <button class="theme-btn" data-theme="energetic">活力</button>
+                <button class="theme-btn" data-theme="romantic">浪漫</button>
+                <button class="theme-btn" data-theme="random">随机</button>
+            </div>
+        </div>
+
+        <!-- 主要内容区域 -->
+        <main class="main-content">
+            <header class="header">
+                <h1 class="title">每日主题</h1>
+                <p class="subtitle">随心情变化的动态界面</p>
+                <div class="current-info">
+                    <div class="time-display" id="timeDisplay"></div>
+                    <div class="date-display" id="dateDisplay"></div>
+                    <div class="theme-display" id="themeDisplay"></div>
+                </div>
+            </header>
+
+            <section class="content-section">
+                <div class="card">
+                    <h3>今日心情</h3>
+                    <div class="mood-indicator">
+                        <div class="mood-icon" id="moodIcon">😊</div>
+                        <p class="mood-text" id="moodText">今天感觉不错！</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>主题信息</h3>
+                    <div class="theme-info">
+                        <p id="themeDescription">当前主题会根据时间和心情自动调整，为您提供最佳的视觉体验。</p>
+                        <div class="theme-stats">
+                            <span class="stat">主题切换次数: <span id="switchCount">0</span></span>
+                            <span class="stat">当前主题: <span id="currentTheme">自动</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>特色功能</h3>
+                    <ul class="features-list">
+                        <li>🌅 时间感知主题切换</li>
+                        <li>😊 心情相关主题</li>
+                        <li>🎨 随机主题生成</li>
+                        <li>✨ 平滑过渡动画</li>
+                        <li>📱 响应式设计</li>
+                        <li>🎵 主题音效（可选）</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="interactive-section">
+                <div class="card">
+                    <h3>互动区域</h3>
+                    <div class="interactive-content">
+                        <button class="interactive-btn" id="particleBtn">释放粒子</button>
+                        <button class="interactive-btn" id="colorBtn">变换颜色</button>
+                        <button class="interactive-btn" id="animationBtn">播放动画</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 粒子效果容器 -->
+        <div class="particles-container" id="particlesContainer"></div>
+
+        <!-- 背景装饰 -->
+        <div class="background-decoration">
+            <div class="floating-shape shape-1"></div>
+            <div class="floating-shape shape-2"></div>
+            <div class="floating-shape shape-3"></div>
+            <div class="floating-shape shape-4"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
