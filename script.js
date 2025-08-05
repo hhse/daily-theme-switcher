@@ -59,6 +59,19 @@ class ThemeManager {
         document.getElementById('animationBtn').addEventListener('click', () => {
             this.playAnimation();
         });
+        
+        // 新增互动按钮事件
+        document.getElementById('typingBtn').addEventListener('click', () => {
+            this.startTypingEffect();
+        });
+        
+        document.getElementById('confettiBtn').addEventListener('click', () => {
+            this.createConfetti();
+        });
+        
+        document.getElementById('rainbowBtn').addEventListener('click', () => {
+            this.toggleRainbowMode();
+        });
     }
     
     setTheme(theme) {
@@ -98,37 +111,31 @@ class ThemeManager {
         // 更新心情显示
         this.updateMoodDisplay(theme);
         
-        // 添加主题切换动画
-        body.classList.add('theme-transition');
-        setTimeout(() => {
-            body.classList.remove('theme-transition');
-        }, 500);
+        // 更新主题描述
+        const themeDescription = document.getElementById('themeDescription');
+        if (themeDescription) {
+            themeDescription.textContent = this.themes[theme]?.description || '当前主题会根据时间和心情自动调整，为您提供最佳的视觉体验。';
+        }
     }
     
     getTimeBasedTheme() {
         const hour = new Date().getHours();
-        
-        if (hour >= 5 && hour < 12) {
-            return 'morning';
-        } else if (hour >= 12 && hour < 17) {
-            return 'afternoon';
-        } else if (hour >= 17 && hour < 20) {
-            return 'evening';
-        } else {
-            return 'night';
-        }
+        if (hour >= 5 && hour < 12) return 'morning';
+        if (hour >= 12 && hour < 17) return 'afternoon';
+        if (hour >= 17 && hour < 20) return 'evening';
+        return 'night';
     }
     
     updateMoodDisplay(theme) {
         const moodIcon = document.getElementById('moodIcon');
         const moodText = document.getElementById('moodText');
         
-        if (this.moodData[theme]) {
-            moodIcon.textContent = this.moodData[theme].icon;
-            moodText.textContent = this.moodData[theme].text;
-        } else {
-            moodIcon.textContent = '😊';
-            moodText.textContent = '今天感觉不错！';
+        if (moodIcon && moodText) {
+            const moodData = this.moodData[theme];
+            if (moodData) {
+                moodIcon.textContent = moodData.icon;
+                moodText.textContent = moodData.text;
+            }
         }
     }
     
@@ -138,64 +145,48 @@ class ThemeManager {
         const dateDisplay = document.getElementById('dateDisplay');
         const themeDisplay = document.getElementById('themeDisplay');
         
-        // 更新时间
-        timeDisplay.textContent = now.toLocaleTimeString('zh-CN', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        });
+        if (timeDisplay) {
+            timeDisplay.textContent = now.toLocaleTimeString('zh-CN', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+        }
         
-        // 更新日期
-        dateDisplay.textContent = now.toLocaleDateString('zh-CN', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            weekday: 'long'
-        });
+        if (dateDisplay) {
+            dateDisplay.textContent = now.toLocaleDateString('zh-CN', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+            });
+        }
         
-        // 更新主题显示
-        const currentThemeName = this.themes[this.currentTheme]?.name || '自动';
-        themeDisplay.textContent = `当前主题: ${currentThemeName}`;
+        if (themeDisplay) {
+            const currentTheme = this.currentTheme === 'auto' ? this.getTimeBasedTheme() : this.currentTheme;
+            themeDisplay.textContent = `当前主题: ${this.themes[currentTheme]?.name || '未知'}`;
+        }
     }
     
     startTimeUpdate() {
         setInterval(() => {
             this.updateTimeDisplay();
-            
-            // 如果是自动模式，检查是否需要切换主题
-            if (this.currentTheme === 'auto') {
-                const newTheme = this.getTimeBasedTheme();
-                const currentAppliedTheme = document.body.getAttribute('data-theme');
-                if (newTheme !== currentAppliedTheme) {
-                    this.applyTheme('auto');
-                }
-            }
         }, 1000);
     }
     
     updateUI() {
-        // 更新主题信息
-        const themeDescription = document.getElementById('themeDescription');
-        const currentThemeSpan = document.getElementById('currentTheme');
-        const switchCountSpan = document.getElementById('switchCount');
-        
-        const themeInfo = this.themes[this.currentTheme];
-        if (themeInfo) {
-            themeDescription.textContent = themeInfo.description;
-            currentThemeSpan.textContent = themeInfo.name;
-        }
-        
-        switchCountSpan.textContent = this.switchCount;
+        document.getElementById('switchCount').textContent = this.switchCount;
+        document.getElementById('currentTheme').textContent = this.themes[this.currentTheme]?.name || '自动';
     }
     
     saveTheme() {
-        localStorage.setItem('dailyTheme', this.currentTheme);
-        localStorage.setItem('themeSwitchCount', this.switchCount);
+        localStorage.setItem('currentTheme', this.currentTheme);
+        localStorage.setItem('switchCount', this.switchCount.toString());
     }
     
     loadTheme() {
-        const savedTheme = localStorage.getItem('dailyTheme');
-        const savedCount = localStorage.getItem('themeSwitchCount');
+        const savedTheme = localStorage.getItem('currentTheme');
+        const savedCount = localStorage.getItem('switchCount');
         
         if (savedTheme) {
             this.currentTheme = savedTheme;
@@ -281,11 +272,562 @@ class ThemeManager {
             }, index * 200);
         });
     }
+    
+    // 新增功能方法
+    
+    // 打字机效果
+    startTypingEffect() {
+        const title = document.getElementById('typingTitle');
+        const subtitle = document.getElementById('typingSubtitle');
+        
+        if (title) {
+            const originalText = title.textContent;
+            title.textContent = '';
+            title.classList.add('typing');
+            
+            let i = 0;
+            const typeWriter = () => {
+                if (i < originalText.length) {
+                    title.textContent += originalText.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 100);
+                } else {
+                    title.classList.remove('typing');
+                }
+            };
+            typeWriter();
+        }
+        
+        if (subtitle) {
+            setTimeout(() => {
+                const originalText = subtitle.textContent;
+                subtitle.textContent = '';
+                subtitle.classList.add('typing');
+                
+                let i = 0;
+                const typeWriter = () => {
+                    if (i < originalText.length) {
+                        subtitle.textContent += originalText.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, 50);
+                    } else {
+                        subtitle.classList.remove('typing');
+                    }
+                };
+                typeWriter();
+            }, 3000);
+        }
+    }
+    
+    // 彩带效果
+    createConfetti() {
+        const container = document.getElementById('confettiContainer');
+        const confettiCount = 50;
+        
+        for (let i = 0; i < confettiCount; i++) {
+            setTimeout(() => {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                
+                // 随机位置
+                confetti.style.left = Math.random() * 100 + '%';
+                
+                // 随机颜色
+                const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd'];
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                // 随机大小
+                const size = Math.random() * 8 + 5;
+                confetti.style.width = size + 'px';
+                confetti.style.height = size + 'px';
+                
+                container.appendChild(confetti);
+                
+                // 3秒后移除彩带
+                setTimeout(() => {
+                    if (confetti.parentNode) {
+                        confetti.parentNode.removeChild(confetti);
+                    }
+                }, 3000);
+            }, i * 50);
+        }
+    }
+    
+    // 彩虹模式
+    toggleRainbowMode() {
+        const body = document.body;
+        body.classList.toggle('rainbow-mode');
+        
+        setTimeout(() => {
+            body.classList.remove('rainbow-mode');
+        }, 5000);
+    }
+}
+
+// 音乐播放器类
+class MusicPlayer {
+    constructor() {
+        this.audio = document.getElementById('backgroundMusic');
+        this.currentSongIndex = 0;
+        this.isPlaying = false;
+        this.playlist = [
+            { name: '轻音乐 - 清晨', url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav' },
+            { name: '轻音乐 - 午后', url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav' },
+            { name: '轻音乐 - 夜晚', url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav' }
+        ];
+        
+        this.init();
+    }
+    
+    init() {
+        this.setupEventListeners();
+        this.updateSongInfo();
+    }
+    
+    setupEventListeners() {
+        document.getElementById('playMusic').addEventListener('click', () => {
+            this.play();
+        });
+        
+        document.getElementById('pauseMusic').addEventListener('click', () => {
+            this.pause();
+        });
+        
+        document.getElementById('nextMusic').addEventListener('click', () => {
+            this.next();
+        });
+        
+        document.getElementById('volumeSlider').addEventListener('input', (e) => {
+            this.setVolume(e.target.value / 100);
+        });
+    }
+    
+    play() {
+        if (!this.isPlaying) {
+            this.audio.src = this.playlist[this.currentSongIndex].url;
+            this.audio.play().then(() => {
+                this.isPlaying = true;
+                this.updateSongInfo();
+            }).catch(err => {
+                console.log('音乐播放失败:', err);
+                this.showMessage('音乐播放失败，请检查网络连接');
+            });
+        }
+    }
+    
+    pause() {
+        this.audio.pause();
+        this.isPlaying = false;
+        this.updateSongInfo();
+    }
+    
+    next() {
+        this.currentSongIndex = (this.currentSongIndex + 1) % this.playlist.length;
+        this.updateSongInfo();
+        if (this.isPlaying) {
+            this.play();
+        }
+    }
+    
+    setVolume(volume) {
+        this.audio.volume = volume;
+    }
+    
+    updateSongInfo() {
+        const songElement = document.getElementById('currentSong');
+        if (songElement) {
+            songElement.textContent = this.isPlaying ? 
+                `正在播放: ${this.playlist[this.currentSongIndex].name}` : 
+                '当前无播放';
+        }
+    }
+    
+    showMessage(message) {
+        const songElement = document.getElementById('currentSong');
+        if (songElement) {
+            songElement.textContent = message;
+            setTimeout(() => {
+                this.updateSongInfo();
+            }, 3000);
+        }
+    }
+}
+
+// 天气API类
+class WeatherAPI {
+    constructor() {
+        this.init();
+    }
+    
+    init() {
+        this.setupEventListeners();
+        this.getLocation();
+    }
+    
+    setupEventListeners() {
+        document.getElementById('refreshWeather').addEventListener('click', () => {
+            this.getLocation();
+        });
+        
+        document.getElementById('searchCity').addEventListener('click', () => {
+            this.searchCity();
+        });
+        
+        document.getElementById('cityInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.searchCity();
+            }
+        });
+        
+        // 快速城市按钮事件
+        document.querySelectorAll('.quick-city-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const city = btn.getAttribute('data-city');
+                this.getWeatherByCity(city);
+            });
+        });
+    }
+    
+    searchCity() {
+        const cityInput = document.getElementById('cityInput');
+        const city = cityInput.value.trim();
+        
+        if (city) {
+            this.getWeatherByCity(city);
+            cityInput.value = '';
+        }
+    }
+    
+    getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    this.getWeather(position.coords.latitude, position.coords.longitude);
+                },
+                (error) => {
+                    console.log('获取位置失败:', error);
+                    // 如果获取位置失败，使用默认城市
+                    this.getWeatherByCity('北京');
+                }
+            );
+        } else {
+            // 浏览器不支持地理位置，使用默认城市
+            this.getWeatherByCity('北京');
+        }
+    }
+    
+    async getWeather(lat, lon) {
+        try {
+            this.showLoading();
+            // 使用免费的天气API
+            const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=439d4b804bc8187953eb36d2a8c26a02&units=metric&lang=zh_cn`);
+            
+            if (!response.ok) {
+                throw new Error('天气API请求失败');
+            }
+            
+            const data = await response.json();
+            const weatherData = this.parseWeatherData(data);
+            this.updateWeatherDisplay(weatherData);
+        } catch (error) {
+            console.log('获取天气失败:', error);
+            // 如果API失败，使用模拟数据
+            const weatherData = this.getMockWeatherData();
+            this.updateWeatherDisplay(weatherData);
+        }
+    }
+    
+    async getWeatherByCity(city) {
+        try {
+            this.showLoading();
+            const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=439d4b804bc8187953eb36d2a8c26a02&units=metric&lang=zh_cn`);
+            
+            if (!response.ok) {
+                throw new Error('天气API请求失败');
+            }
+            
+            const data = await response.json();
+            const weatherData = this.parseWeatherData(data);
+            this.updateWeatherDisplay(weatherData);
+        } catch (error) {
+            console.log('获取天气失败:', error);
+            const weatherData = this.getMockWeatherData();
+            this.updateWeatherDisplay(weatherData);
+        }
+    }
+    
+    showLoading() {
+        document.getElementById('weatherLocation').textContent = '获取天气中...';
+        document.getElementById('weatherTemp').textContent = '--°C';
+        document.getElementById('weatherDesc').textContent = '--';
+        document.getElementById('weatherIcon').textContent = '⏳';
+    }
+    
+    parseWeatherData(data) {
+        const weatherId = data.weather[0].id;
+        const temperature = Math.round(data.main.temp);
+        const condition = data.weather[0].description;
+        const city = data.name;
+        
+        // 根据天气ID获取对应的图标
+        const icon = this.getWeatherIcon(weatherId);
+        
+        return {
+            location: city,
+            temperature: temperature,
+            condition: condition,
+            icon: icon
+        };
+    }
+    
+    getWeatherIcon(weatherId) {
+        // 根据OpenWeatherMap的天气ID返回对应的emoji图标
+        if (weatherId >= 200 && weatherId < 300) return '⛈️'; // 雷雨
+        if (weatherId >= 300 && weatherId < 400) return '🌧️'; // 小雨
+        if (weatherId >= 500 && weatherId < 600) return '🌧️'; // 雨
+        if (weatherId >= 600 && weatherId < 700) return '❄️'; // 雪
+        if (weatherId >= 700 && weatherId < 800) return '🌫️'; // 雾
+        if (weatherId === 800) return '☀️'; // 晴天
+        if (weatherId === 801) return '🌤️'; // 少云
+        if (weatherId >= 802 && weatherId < 900) return '☁️'; // 多云
+        return '🌤️'; // 默认
+    }
+    
+    getMockWeatherData() {
+        const conditions = ['晴天', '多云', '小雨', '阴天'];
+        const temperatures = [15, 20, 25, 30];
+        const icons = ['☀️', '⛅', '🌧️', '☁️'];
+        
+        const randomIndex = Math.floor(Math.random() * conditions.length);
+        
+        return {
+            location: '当前位置',
+            temperature: temperatures[randomIndex],
+            condition: conditions[randomIndex],
+            icon: icons[randomIndex]
+        };
+    }
+    
+    updateWeatherDisplay(data) {
+        document.getElementById('weatherLocation').textContent = data.location;
+        document.getElementById('weatherTemp').textContent = `${data.temperature}°C`;
+        document.getElementById('weatherDesc').textContent = data.condition;
+        document.getElementById('weatherIcon').textContent = data.icon;
+    }
+    
+    showWeatherError() {
+        document.getElementById('weatherLocation').textContent = '无法获取位置';
+        document.getElementById('weatherTemp').textContent = '--°C';
+        document.getElementById('weatherDesc').textContent = '--';
+        document.getElementById('weatherIcon').textContent = '❓';
+    }
+}
+
+// 倒计时类
+class CountdownTimer {
+    constructor() {
+        this.targetDate = null;
+        this.countdownInterval = null;
+        this.init();
+    }
+    
+    init() {
+        this.setupEventListeners();
+        this.loadSavedCountdown();
+    }
+    
+    setupEventListeners() {
+        document.getElementById('setCountdown').addEventListener('click', () => {
+            this.setCountdown();
+        });
+    }
+    
+    setCountdown() {
+        const dateInput = document.getElementById('countdownDate');
+        const eventInput = document.getElementById('countdownEvent');
+        
+        if (dateInput.value) {
+            this.targetDate = new Date(dateInput.value);
+            const eventName = eventInput.value || '重要日子';
+            
+            localStorage.setItem('countdownDate', this.targetDate.getTime());
+            localStorage.setItem('countdownEvent', eventName);
+            
+            this.startCountdown();
+            this.updateEventName(eventName);
+        }
+    }
+    
+    loadSavedCountdown() {
+        const savedDate = localStorage.getItem('countdownDate');
+        const savedEvent = localStorage.getItem('countdownEvent');
+        
+        if (savedDate) {
+            this.targetDate = new Date(parseInt(savedDate));
+            this.startCountdown();
+            if (savedEvent) {
+                this.updateEventName(savedEvent);
+            }
+        }
+    }
+    
+    startCountdown() {
+        if (this.countdownInterval) {
+            clearInterval(this.countdownInterval);
+        }
+        
+        this.updateCountdown();
+        this.countdownInterval = setInterval(() => {
+            this.updateCountdown();
+        }, 1000);
+    }
+    
+    updateCountdown() {
+        if (!this.targetDate) return;
+        
+        const now = new Date().getTime();
+        const distance = this.targetDate.getTime() - now;
+        
+        if (distance < 0) {
+            this.showExpiredMessage();
+            return;
+        }
+        
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        
+        document.getElementById('daysCount').textContent = days.toString().padStart(2, '0');
+        document.getElementById('hoursCount').textContent = hours.toString().padStart(2, '0');
+        document.getElementById('minutesCount').textContent = minutes.toString().padStart(2, '0');
+        document.getElementById('secondsCount').textContent = seconds.toString().padStart(2, '0');
+    }
+    
+    updateEventName(eventName) {
+        document.getElementById('countdownEvent').textContent = `距离${eventName}`;
+    }
+    
+    showExpiredMessage() {
+        document.getElementById('daysCount').textContent = '00';
+        document.getElementById('hoursCount').textContent = '00';
+        document.getElementById('minutesCount').textContent = '00';
+        document.getElementById('secondsCount').textContent = '00';
+        document.getElementById('countdownEvent').textContent = '倒计时已结束！';
+    }
+}
+
+// 语音控制类
+class VoiceControl {
+    constructor() {
+        this.recognition = null;
+        this.isListening = false;
+        this.init();
+    }
+    
+    init() {
+        this.setupEventListeners();
+        this.initSpeechRecognition();
+    }
+    
+    setupEventListeners() {
+        document.getElementById('startVoice').addEventListener('click', () => {
+            this.startListening();
+        });
+        
+        document.getElementById('stopVoice').addEventListener('click', () => {
+            this.stopListening();
+        });
+    }
+    
+    initSpeechRecognition() {
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            this.recognition = new SpeechRecognition();
+            this.recognition.continuous = false;
+            this.recognition.interimResults = false;
+            this.recognition.lang = 'zh-CN';
+            
+            this.recognition.onstart = () => {
+                this.isListening = true;
+                this.updateVoiceStatus('正在听取命令...', '🟢');
+            };
+            
+            this.recognition.onresult = (event) => {
+                const command = event.results[0][0].transcript.toLowerCase();
+                this.processCommand(command);
+            };
+            
+            this.recognition.onerror = (event) => {
+                console.log('语音识别错误:', event.error);
+                this.updateVoiceStatus('语音识别失败', '🔴');
+                this.isListening = false;
+            };
+            
+            this.recognition.onend = () => {
+                this.isListening = false;
+                this.updateVoiceStatus('点击开始语音控制', '🔴');
+            };
+        } else {
+            this.updateVoiceStatus('浏览器不支持语音识别', '🔴');
+        }
+    }
+    
+    startListening() {
+        if (this.recognition && !this.isListening) {
+            this.recognition.start();
+        }
+    }
+    
+    stopListening() {
+        if (this.recognition && this.isListening) {
+            this.recognition.stop();
+        }
+    }
+    
+    processCommand(command) {
+        console.log('识别到命令:', command);
+        
+        if (command.includes('切换主题') || command.includes('随机主题')) {
+            themeManager.setTheme('random');
+            this.showMessage('已切换到随机主题');
+        } else if (command.includes('清晨') || command.includes('早晨')) {
+            themeManager.setTheme('morning');
+            this.showMessage('已切换到清晨主题');
+        } else if (command.includes('夜晚') || command.includes('晚上')) {
+            themeManager.setTheme('night');
+            this.showMessage('已切换到夜晚主题');
+        } else if (command.includes('播放音乐')) {
+            musicPlayer.play();
+            this.showMessage('开始播放音乐');
+        } else if (command.includes('释放粒子')) {
+            themeManager.createParticles();
+            this.showMessage('释放粒子效果');
+        } else {
+            this.showMessage('未识别的命令');
+        }
+    }
+    
+    updateVoiceStatus(message, indicator) {
+        document.getElementById('voiceStatus').textContent = message;
+        document.getElementById('voiceIndicator').textContent = indicator;
+    }
+    
+    showMessage(message) {
+        this.updateVoiceStatus(message, '🟢');
+        setTimeout(() => {
+            this.updateVoiceStatus('点击开始语音控制', '🔴');
+        }, 2000);
+    }
 }
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', () => {
-    const themeManager = new ThemeManager();
+    window.themeManager = new ThemeManager();
+    window.musicPlayer = new MusicPlayer();
+    window.weatherAPI = new WeatherAPI();
+    window.countdownTimer = new CountdownTimer();
+    window.voiceControl = new VoiceControl();
     
     // 添加页面加载动画
     document.body.classList.add('loading');
@@ -350,6 +892,24 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'a':
                 themeManager.playAnimation();
                 break;
+            case 't':
+                themeManager.startTypingEffect();
+                break;
+            case 'f':
+                themeManager.createConfetti();
+                break;
+            case 'b':
+                themeManager.toggleRainbowMode();
+                break;
+            case 't':
+                themeManager.startTypingEffect();
+                break;
+            case 'f':
+                themeManager.createConfetti();
+                break;
+            case 'b':
+                themeManager.toggleRainbowMode();
+                break;
         }
     });
     
@@ -401,7 +961,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log('🎨 每日主题网页已加载完成！');
     console.log('💡 提示：使用数字键 1-8 快速切换主题，0 返回自动模式，r 随机主题');
-    console.log('🎮 互动：p 释放粒子，c 变换颜色，a 播放动画');
+    console.log('🎮 互动：p 释放粒子，c 变换颜色，a 播放动画，t 打字机效果，f 彩带，b 彩虹模式');
+    console.log('🎤 语音控制：点击"开始语音"按钮进行语音控制');
 });
 
 // 添加一些额外的工具函数

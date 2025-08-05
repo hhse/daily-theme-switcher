@@ -29,8 +29,8 @@
         <!-- 主要内容区域 -->
         <main class="main-content">
             <header class="header">
-                <h1 class="title">每日主题</h1>
-                <p class="subtitle">随心情变化的动态界面</p>
+                <h1 class="title" id="typingTitle">每日主题</h1>
+                <p class="subtitle" id="typingSubtitle">随心情变化的动态界面</p>
                 <div class="current-info">
                     <div class="time-display" id="timeDisplay"></div>
                     <div class="date-display" id="dateDisplay"></div>
@@ -39,7 +39,7 @@
             </header>
 
             <section class="content-section">
-                <div class="card">
+                <div class="card card-3d">
                     <h3>今日心情</h3>
                     <div class="mood-indicator">
                         <div class="mood-icon" id="moodIcon">😊</div>
@@ -47,7 +47,7 @@
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card card-3d">
                     <h3>主题信息</h3>
                     <div class="theme-info">
                         <p id="themeDescription">当前主题会根据时间和心情自动调整，为您提供最佳的视觉体验。</p>
@@ -58,7 +58,7 @@
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card card-3d">
                     <h3>特色功能</h3>
                     <ul class="features-list">
                         <li>🌅 时间感知主题切换</li>
@@ -67,17 +67,129 @@
                         <li>✨ 平滑过渡动画</li>
                         <li>📱 响应式设计</li>
                         <li>🎵 主题音效（可选）</li>
+                        <li>🎤 语音控制</li>
+                        <li>🌤️ 实时天气</li>
+                        <li>⏰ 倒计时功能</li>
+                        <li>🎮 3D交互效果</li>
                     </ul>
                 </div>
             </section>
 
+            <!-- 新增功能区域 -->
+            <section class="new-features-section">
+                <!-- 音乐播放器 -->
+                <div class="card card-3d">
+                    <h3>🎵 背景音乐</h3>
+                    <div class="music-player">
+                        <div class="music-controls">
+                            <button id="playMusic" class="music-btn">▶️ 播放</button>
+                            <button id="pauseMusic" class="music-btn">⏸️ 暂停</button>
+                            <button id="nextMusic" class="music-btn">⏭️ 下一首</button>
+                        </div>
+                        <div class="music-info">
+                            <p id="currentSong">当前无播放</p>
+                            <div class="volume-control">
+                                <span>音量:</span>
+                                <input type="range" id="volumeSlider" min="0" max="100" value="50">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 天气信息 -->
+                <div class="card card-3d">
+                    <h3>🌤️ 实时天气</h3>
+                    <div class="weather-info">
+                        <div class="weather-display">
+                            <div class="weather-icon" id="weatherIcon">🌤️</div>
+                            <div class="weather-details">
+                                <p id="weatherLocation">正在获取位置...</p>
+                                <p id="weatherTemp">--°C</p>
+                                <p id="weatherDesc">--</p>
+                            </div>
+                        </div>
+                        <div class="weather-controls">
+                            <div class="city-input-group">
+                                <input type="text" id="cityInput" placeholder="输入城市名称" class="city-input">
+                                <button id="searchCity" class="city-btn">🔍</button>
+                            </div>
+                            <div class="quick-cities">
+                                <button class="quick-city-btn" data-city="北京">北京</button>
+                                <button class="quick-city-btn" data-city="上海">上海</button>
+                                <button class="quick-city-btn" data-city="广州">广州</button>
+                                <button class="quick-city-btn" data-city="深圳">深圳</button>
+                            </div>
+                            <button id="refreshWeather" class="weather-btn">🔄 刷新</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 倒计时功能 -->
+                <div class="card card-3d">
+                    <h3>⏰ 倒计时</h3>
+                    <div class="countdown-section">
+                        <div class="countdown-display">
+                            <div class="countdown-item">
+                                <span class="countdown-number" id="daysCount">00</span>
+                                <span class="countdown-label">天</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="countdown-number" id="hoursCount">00</span>
+                                <span class="countdown-label">时</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="countdown-number" id="minutesCount">00</span>
+                                <span class="countdown-label">分</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="countdown-number" id="secondsCount">00</span>
+                                <span class="countdown-label">秒</span>
+                            </div>
+                        </div>
+                        <div class="countdown-controls">
+                            <input type="date" id="countdownDate" class="countdown-input">
+                            <button id="setCountdown" class="countdown-btn">设置倒计时</button>
+                        </div>
+                        <p id="countdownEvent">距离下一个重要日子</p>
+                    </div>
+                </div>
+
+                <!-- 语音控制 -->
+                <div class="card card-3d">
+                    <h3>🎤 语音控制</h3>
+                    <div class="voice-control">
+                        <div class="voice-status">
+                            <div class="voice-indicator" id="voiceIndicator">🔴</div>
+                            <p id="voiceStatus">点击开始语音控制</p>
+                        </div>
+                        <div class="voice-controls">
+                            <button id="startVoice" class="voice-btn">🎤 开始语音</button>
+                            <button id="stopVoice" class="voice-btn">⏹️ 停止语音</button>
+                        </div>
+                        <div class="voice-commands">
+                            <p>语音命令:</p>
+                            <ul>
+                                <li>"切换主题" - 随机主题</li>
+                                <li>"清晨模式" - 切换到清晨主题</li>
+                                <li>"夜晚模式" - 切换到夜晚主题</li>
+                                <li>"播放音乐" - 播放背景音乐</li>
+                                <li>"释放粒子" - 触发粒子效果</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <section class="interactive-section">
-                <div class="card">
+                <div class="card card-3d">
                     <h3>互动区域</h3>
                     <div class="interactive-content">
                         <button class="interactive-btn" id="particleBtn">释放粒子</button>
                         <button class="interactive-btn" id="colorBtn">变换颜色</button>
                         <button class="interactive-btn" id="animationBtn">播放动画</button>
+                        <button class="interactive-btn" id="typingBtn">打字机效果</button>
+                        <button class="interactive-btn" id="confettiBtn">庆祝彩带</button>
+                        <button class="interactive-btn" id="rainbowBtn">彩虹模式</button>
                     </div>
                 </div>
             </section>
@@ -86,6 +198,9 @@
         <!-- 粒子效果容器 -->
         <div class="particles-container" id="particlesContainer"></div>
 
+        <!-- 彩带效果容器 -->
+        <div class="confetti-container" id="confettiContainer"></div>
+
         <!-- 背景装饰 -->
         <div class="background-decoration">
             <div class="floating-shape shape-1"></div>
@@ -93,6 +208,11 @@
             <div class="floating-shape shape-3"></div>
             <div class="floating-shape shape-4"></div>
         </div>
+
+        <!-- 音频元素 -->
+        <audio id="backgroundMusic" loop>
+            <source src="" type="audio/mpeg">
+        </audio>
     </div>
 
     <script src="script.js"></script>
